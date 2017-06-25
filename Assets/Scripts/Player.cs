@@ -4,20 +4,27 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
 
+	//Floats
 	public float maxSpeed;
 	public float speed;
 	public float jumpPower;
 
+	//Booleans
 	public bool grounded;
+	public bool inBienenstockCol;
 
+	//References
 	private Rigidbody2D rb2d;
 	private Animator anim;
+	private GameMaster gm;
 
 
 	// Use this for initialization 
 	void Start () {
 		rb2d = gameObject.GetComponent<Rigidbody2D> ();			//referneziert Objekte zu Unity Objekte
 		anim = gameObject.GetComponent<Animator> ();
+
+		gm = GameObject.FindGameObjectWithTag("GameMaster").GetComponent<GameMaster>();
 	}
 	
 	// Update is called once per frame
@@ -44,6 +51,15 @@ public class Player : MonoBehaviour {
 			rb2d.AddForce (Vector2.up * jumpPower);
 		}
 
+
+
+		if (Input.GetKeyDown(KeyCode.C) && inBienenstockCol && gm.chemicals >= 1) 
+		{
+			Debug.Log ("Du hast einen Bienenstock befreit");
+			gm.bienenstockUebrig -= 1;
+			gm.chemicals -= 1;
+		}
+
 	}
 
 	void FixedUpdate() 
@@ -63,4 +79,20 @@ public class Player : MonoBehaviour {
 		}
 
 	}
+
+	void OnTriggerEnter2D(Collider2D col)
+	{
+		if (col.CompareTag("Chemical")) 
+		{
+			Destroy(col.gameObject);
+			gm.chemicals += 1;
+		}
+			
+		if (col.CompareTag("Bienenstock")) 
+		{
+			inBienenstockCol = true;
+		}
+	}
+
+
 }
